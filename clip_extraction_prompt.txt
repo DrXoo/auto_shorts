@@ -14,12 +14,6 @@ You are analyzing a Spanish gaming podcast transcript to identify the best segme
 
 Look for segments that have:
 
-**HIGH PRIORITY - Trending Topics:**
-- Discussions about any of the trending games/topics listed above
-- Strong opinions or hot takes about popular games
-- Breaking news or recent announcements
-- Controversy or debate about trending titles
-
 **CONTENT QUALITY:**
 - **Emotional moments:** Excitement, surprise, laughter, strong reactions
 - **Hot takes:** Controversial or unexpected opinions
@@ -27,62 +21,136 @@ Look for segments that have:
 - **Storytelling:** Funny anecdotes or gaming experiences
 - **Tips/Insights:** Valuable advice or little-known facts
 - **Predictions:** Bold predictions about gaming industry
+- **Strong opinions:** Hot takes about popular games
+- **Breaking news:** Recent announcements or industry news
+- **Controversy:** Debate about games or industry topics
 
 **TECHNICAL REQUIREMENTS:**
 - Duration: 30-90 seconds (ideal: 45-60 seconds)
 - Self-contained: Can be understood without prior context
 - Clear speakers: Not too many people talking at once
 - Good pacing: Engaging throughout, not slow or monotonous
+- **Natural boundaries:** Find natural conversation breaks - don't cut mid-sentence or mid-word
+- **Complete thoughts:** Clip should start and end at logical points in the conversation
 
 ### 2. AVOID
 - Long explanations that lose energy
 - Technical jargon without context
 - Inside jokes that need background
 - Slow-paced discussions
+- Cutting mid-sentence or mid-thought
+- Abrupt starts or endings
 
 ### 3. INPUT FORMAT 
 
+The transcript is provided in this format:
+
+```
 [segment_start_second - segment_end_second] speaker_name: sentence
+```
 
-### 3. OUTPUT FORMAT
+Example:
+```
+[150.5 - 153.2] SPEAKER_01: Eso es increíble!
+[153.5 - 158.8] SPEAKER_02: Sí, pero el problema es que...
+```
 
-For each clip you identify, provide:
+### 4. OUTPUT FORMAT
+
+Provide a JSON array with ALL clips. Each clip must include:
 
 ```json
-{
-  "clip_number": 1,
-  "start_time": "MM:SS", 
-  "end_time": "MM:SS",
-  "duration_seconds": 45,
-  "title": "Catchy title for the clip",
-  "description": "Brief description of what happens",
-  "trending_topic": "Which trending topic it relates to (if any)",
-  "viral_potential": "HIGH/MEDIUM/LOW",
-  "why_viral": "Why this will perform well as a short video",
-  "hook": "First 3 seconds that grab attention",
-}
+[
+  {
+    "clip_number": 1,
+    "start_time": "2:30",
+    "end_time": "3:15",
+    "duration_seconds": 45,
+    "speakers": ["SPEAKER_01", "SPEAKER_02"],
+    "title": "Catchy title for the clip",
+    "description": "Brief description of what happens",
+    "viral_potential": "HIGH/MEDIUM/LOW",
+    "why_viral": "Why this will perform well as a short video",
+    "hook": "First 3 seconds that grab attention"
+  },
+  {
+    "clip_number": 2,
+    "start_time": "5:45",
+    "end_time": "6:30",
+    "duration_seconds": 45,
+    "speakers": ["SPEAKER_00", "SPEAKER_01", "SPEAKER_02"],
+    "title": "Another clip title",
+    "description": "What happens in this clip",
+    "viral_potential": "MEDIUM",
+    "why_viral": "Explains viral potential",
+    "hook": "Opening hook description"
+  }
+]
 ```
-start_time = the first segment_start_second 
-end_time = the last segment_end_second
 
-### 4. PRIORITIZATION
+**IMPORTANT TIME FORMAT RULES:**
+- Format: "M:SS" or "MM:SS" (NO leading zeros on minutes)
+- Examples: "2:30" (correct), "02:30" (wrong), "15:45" (correct)
+- To convert from seconds to time:
+  - Minutes = floor(seconds ÷ 60)
+  - Seconds = seconds mod 60
+  - Example: 150 seconds = "2:30" (150 ÷ 60 = 2 minutes, 30 seconds remaining)
+- `start_time` = convert the FIRST segment_start_second in the clip
+- `end_time` = convert the LAST segment_end_second in the clip
+
+**SPEAKERS FIELD:**
+- List all unique speakers who talk in this clip
+- Use exact speaker names from transcript (e.g., ["SPEAKER_01", "SPEAKER_02"])
+- Order doesn't matter
+
+### 5. PRIORITIZATION
 
 Rank clips by:
-1. Relevance to trending topics (highest weight)
-2. Emotional impact / entertainment value
-3. Shareability (will people send this to friends?)
-4. Platform fit (works well in vertical video format)
+1. Emotional impact / entertainment value
+2. Shareability (will people send this to friends?)
+3. Platform fit (works well in vertical video format)
+4. Virality potential (stops scrollers, generates engagement)
+
+## EXAMPLE
+
+**Input transcript fragment:**
+```
+[150.5 - 153.2] SPEAKER_01: ¡No puedo creer que hayan hecho eso!
+[153.5 - 156.8] SPEAKER_02: Es la peor decisión que han tomado.
+[157.0 - 162.5] SPEAKER_01: Literal, van a perder millones de jugadores.
+[163.0 - 168.2] SPEAKER_03: Bueno, pero hay que ver el lado positivo...
+[168.5 - 174.8] SPEAKER_02: ¿Qué lado positivo? Esto es un desastre total.
+```
+
+**Output:**
+```json
+[
+  {
+    "clip_number": 1,
+    "start_time": "2:30",
+    "end_time": "2:54",
+    "duration_seconds": 24,
+    "speakers": ["SPEAKER_01", "SPEAKER_02", "SPEAKER_03"],
+    "title": "La PEOR Decisión de la Historia",
+    "description": "Los hosts reaccionan con incredulidad a una decisión polémica",
+    "viral_potential": "HIGH",
+    "why_viral": "Strong emotional reactions, controversial opinion, relatable frustration",
+    "hook": "¡No puedo creer que hayan hecho eso! - immediate shock value"
+  }
+]
+```
 
 ## YOUR TASK
 
 1. Analyze the FULL transcript (provided separately)
 2. Identify 5-20 best clips for short-form videos
-3. Prioritize clips about trending topics
-4. Provide detailed JSON output for each clip
-5. Rank them by viral potential
+3. Find natural conversation boundaries for each clip
+4. Provide complete JSON array output for ALL clips
+5. Rank them by viral potential (put highest potential first)
 
 Focus on creating clips that will:
 - Stop scrollers in their tracks
 - Generate comments and shares
 - Work well with captions/subtitles
 - Appeal to Spanish-speaking gaming audience
+- Have natural beginnings and endings
