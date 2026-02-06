@@ -1,0 +1,88 @@
+# TASK: Extract Viral-Worthy Clips from Gaming Podcast
+
+## CONTEXT
+You are analyzing a Spanish gaming podcast transcript to identify the best segments for creating viral short-form videos (TikTok, Instagram Reels, YouTube Shorts).
+
+**Podcast Details:**
+- Language: Spanish
+- Format: 3 people discussing videogames (can be more depending on the topic)
+- Speakers: each speaker will have a name like SPEAKER_01, SPEAKER_02, SPEAKER_00 (and possibly others)
+
+## INSTRUCTIONS
+
+### 1. IDENTIFY VIRAL-WORTHY SEGMENTS (30-90 seconds)
+
+Look for segments that have:
+
+**HIGH PRIORITY - Trending Topics:**
+- Discussions about any of the trending games/topics listed above
+- Strong opinions or hot takes about popular games
+- Breaking news or recent announcements
+- Controversy or debate about trending titles
+
+**CONTENT QUALITY:**
+- **Emotional moments:** Excitement, surprise, laughter, strong reactions
+- **Hot takes:** Controversial or unexpected opinions
+- **Debates:** Arguments or disagreements between hosts
+- **Storytelling:** Funny anecdotes or gaming experiences
+- **Tips/Insights:** Valuable advice or little-known facts
+- **Predictions:** Bold predictions about gaming industry
+
+**TECHNICAL REQUIREMENTS:**
+- Duration: 30-90 seconds (ideal: 45-60 seconds)
+- Self-contained: Can be understood without prior context
+- Clear speakers: Not too many people talking at once
+- Good pacing: Engaging throughout, not slow or monotonous
+
+### 2. AVOID
+- Long explanations that lose energy
+- Technical jargon without context
+- Inside jokes that need background
+- Slow-paced discussions
+
+### 3. INPUT FORMAT 
+
+[segment_start_second - segment_end_second] speaker_name: sentence
+
+### 3. OUTPUT FORMAT
+
+For each clip you identify, provide:
+
+```json
+{
+  "clip_number": 1,
+  "start_time": "MM:SS", 
+  "end_time": "MM:SS",
+  "duration_seconds": 45,
+  "title": "Catchy title for the clip",
+  "description": "Brief description of what happens",
+  "trending_topic": "Which trending topic it relates to (if any)",
+  "viral_potential": "HIGH/MEDIUM/LOW",
+  "why_viral": "Why this will perform well as a short video",
+  "hook": "First 3 seconds that grab attention",
+}
+```
+start_time = the first segment_start_second 
+end_time = the last segment_end_second
+
+### 4. PRIORITIZATION
+
+Rank clips by:
+1. Relevance to trending topics (highest weight)
+2. Emotional impact / entertainment value
+3. Shareability (will people send this to friends?)
+4. Platform fit (works well in vertical video format)
+
+## YOUR TASK
+
+1. Analyze the FULL transcript (provided separately)
+2. Identify 5-20 best clips for short-form videos
+3. Prioritize clips about trending topics
+4. Provide detailed JSON output for each clip
+5. Rank them by viral potential
+
+Focus on creating clips that will:
+- Stop scrollers in their tracks
+- Generate comments and shares
+- Work well with captions/subtitles
+- Appeal to Spanish-speaking gaming audience
