@@ -7,10 +7,10 @@ import re
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 OUTPUT_DIR = PROJECT_ROOT / "output"
-CANDIDATES_DIR = OUTPUT_DIR / "candidates"
-READY_DIR = OUTPUT_DIR / "ready_for_subs"
-RELEASE_DIR = OUTPUT_DIR / "release"
-READ_AI_DIR = OUTPUT_DIR / "read_ai"
+CANDIDATES_DIR = OUTPUT_DIR / "extracted"
+READY_DIR = OUTPUT_DIR / "cropped"
+RELEASE_DIR = OUTPUT_DIR / "final"
+READ_AI_DIR = OUTPUT_DIR / "ai_analysis"
 TRANSCRIPTS_DIR = OUTPUT_DIR / "transcripts"
 
 CLIPS_JSON = READ_AI_DIR / "clips.json"

@@ -129,8 +129,8 @@ def crop_to_vertical():
     
     # Define paths
     base_dir = Path(__file__).parent.parent
-    candidates_dir = base_dir / "output" / "candidates"
-    output_dir = base_dir / "output" / "ready_for_subs"
+    candidates_dir = base_dir / "output" / "extracted"
+    output_dir = base_dir / "output" / "cropped"
     
     # Create output directory if it doesn't exist
     output_dir.mkdir(parents=True, exist_ok=True)

@@ -20,11 +20,13 @@ input/*.mp3
 input/*.wav
 input/*.avi
 input/*.mov
-output/candidates/*.mp4
-output/ready_for_subs/*.mp4
-output/release/*.mp4
+output/extracted/*.mp4
+output/cropped/*.mp4
+output/final/*.mp4
 output/transcripts/*.json
 output/transcripts/*.txt
+output/ai_analysis/*.json
+output/pipeline_state.json
 
 # Keep folder structure
 !input/.gitkeep

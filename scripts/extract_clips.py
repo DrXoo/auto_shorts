@@ -8,8 +8,8 @@ SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 INPUT_DIR = PROJECT_ROOT / "input"
 OUTPUT_DIR = PROJECT_ROOT / "output"
-CLIPS_DIR = OUTPUT_DIR / "candidates"
-READ_AI_DIR = OUTPUT_DIR / "read_ai"
+CLIPS_DIR = OUTPUT_DIR / "extracted"
+READ_AI_DIR = OUTPUT_DIR / "ai_analysis"
 
 VIDEO_FILE = INPUT_DIR / "notisias.mp4"
 CLIPS_JSON = READ_AI_DIR / "clips.json"
