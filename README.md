@@ -67,11 +67,16 @@ autoshorts/
 │   ├── cropped/                  # Vertical format clips
 │   └── final/                    # Final videos with subtitles
 │       └── clip_XX_title_subtitled.mp4  # ← UPLOAD THESE!
-├── scripts/                      # Individual pipeline scripts
-│   ├── transcribe_with_speakers.py
-│   ├── extract_clips.py
-│   ├── crop_to_vertical.py
-│   └── add_subtitles.py
+├── scripts/
+│   ├── steps/                    # Pipeline steps (run by orchestrator)
+│   │   ├── 1_transcribe.py
+│   │   ├── 2_extract_clips.py
+│   │   ├── 3_crop_to_vertical.py
+│   │   └── 4_add_subtitles.py
+│   └── utils/                    # Utility scripts
+│       ├── check_gpu.py
+│       ├── find_crop_positions.py
+│       └── fetch_*_trends.py
 └── run_pipeline.py              # 🚀 Main orchestrator
 ```
 
@@ -104,16 +109,33 @@ You can still run individual steps manually:
 
 ```bash
 # Step 1: Transcribe
-python scripts/transcribe_with_speakers.py
+python scripts/steps/1_transcribe.py
 
 # Step 3: Extract clips
-python scripts/extract_clips.py
+python scripts/steps/2_extract_clips.py
 
 # Step 4: Crop to vertical
-python scripts/crop_to_vertical.py
+python scripts/steps/3_crop_to_vertical.py
 
 # Step 5: Add subtitles
-python scripts/add_subtitles.py
+python scripts/steps/4_add_subtitles.py
+```
+
+## Utility Scripts
+
+Helper scripts for various tasks:
+
+```bash
+# Check GPU availability for transcription
+python scripts/utils/check_gpu.py
+
+# Find optimal crop positions for your video layout
+python scripts/utils/find_crop_positions.py
+
+# Fetch trending topics (for content ideas)
+python scripts/utils/fetch_reddit_trends.py
+python scripts/utils/fetch_steam_trends.py
+python scripts/utils/fetch_youtube_trends.py
 ```
 
 ## Requirements
@@ -126,14 +148,14 @@ python scripts/add_subtitles.py
 ## Customization
 
 ### Subtitle Styling
-Edit `scripts/add_subtitles.py` to customize:
+Edit `scripts/steps/4_add_subtitles.py` to customize:
 - Font family and size
 - Colors (text, karaoke effect, outline)
 - Position on screen
 - Timing and grouping
 
 ### Crop Positions
-Edit `scripts/crop_to_vertical.py` to adjust:
+Edit `scripts/steps/3_crop_to_vertical.py` to adjust:
 - Single crop position (content sharing mode)
 - Triple crop positions (speaker triangle mode)
 - Auto-detection settings
