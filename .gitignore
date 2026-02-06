@@ -1,0 +1,49 @@
+# Environment variables (contains secrets!)
+.env
+*.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+
+# Video/Audio files
+input/*.mp4
+input/*.mp3
+input/*.wav
+input/*.avi
+input/*.mov
+output/candidates/*.mp4
+output/ready_for_subs/*.mp4
+output/release/*.mp4
+output/transcripts/*.json
+output/transcripts/*.txt
+
+# Keep folder structure
+!input/.gitkeep
+!output/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+
+/output
+/input
