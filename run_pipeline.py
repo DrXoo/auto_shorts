@@ -27,6 +27,7 @@ import json
 # Paths
 SCRIPT_DIR = Path(__file__).parent
 SCRIPTS_DIR = SCRIPT_DIR / "scripts"
+STEPS_DIR = SCRIPTS_DIR / "steps"
 INPUT_DIR = SCRIPT_DIR / "input"
 OUTPUT_DIR = SCRIPT_DIR / "output"
 AI_ANALYSIS_DIR = OUTPUT_DIR / "ai_analysis"
@@ -97,7 +98,7 @@ def save_state(state):
 
 def run_script(script_name, description):
     """Run a Python script and return success status"""
-    script_path = SCRIPTS_DIR / script_name
+    script_path = STEPS_DIR / script_name
     
     print_info(f"Running: {script_name}")
     print_info(f"Command: python {script_path}")
@@ -239,7 +240,7 @@ def run_pipeline(start_step=1, skip_transcribe=False):
         {
             "num": 1,
             "title": "Transcribe Video with Speaker Diarization",
-            "script": "transcribe_with_speakers.py",
+            "script": "1_transcribe.py",
             "description": "Transcription"
         },
         {
@@ -251,19 +252,19 @@ def run_pipeline(start_step=1, skip_transcribe=False):
         {
             "num": 3,
             "title": "Extract Clips from Video",
-            "script": "extract_clips.py",
+            "script": "2_extract_clips.py",
             "description": "Clip extraction"
         },
         {
             "num": 4,
             "title": "Crop to Vertical Format (9:16)",
-            "script": "crop_to_vertical.py",
+            "script": "3_crop_to_vertical.py",
             "description": "Cropping"
         },
         {
             "num": 5,
             "title": "Add Karaoke Subtitles",
-            "script": "add_subtitles.py",
+            "script": "4_add_subtitles.py",
             "description": "Subtitle generation"
         }
     ]
