@@ -74,7 +74,9 @@ autoshorts/
 │   │   ├── 3_crop_to_vertical.py
 │   │   └── 4_add_subtitles.py
 │   └── utils/                    # Utility scripts
+│       ├── aggregate_trending_topics.py
 │       ├── check_gpu.py
+│       ├── clean_output.py
 │       ├── find_crop_positions.py
 │       └── fetch_*_trends.py
 └── run_pipeline.py              # 🚀 Main orchestrator
@@ -132,11 +134,32 @@ python scripts/utils/check_gpu.py
 # Find optimal crop positions for your video layout
 python scripts/utils/find_crop_positions.py
 
-# Fetch trending topics (for content ideas)
+# Aggregate trending topics from all sources (Recommended!)
+python scripts/utils/aggregate_trending_topics.py
+
+# Fetch trending topics from individual sources
 python scripts/utils/fetch_reddit_trends.py
 python scripts/utils/fetch_steam_trends.py
 python scripts/utils/fetch_youtube_trends.py
+
+# Clean all output files (keeps folder structure)
+python scripts/utils/clean_output.py
 ```
+
+### Getting Trending Topics for AI Analysis
+
+The `aggregate_trending_topics.py` script fetches gaming trends from:
+- **Reddit** (r/gaming, r/Games, r/pcgaming, etc.)
+- **Steam** (top sellers, new releases, most played)
+- **YouTube** (trending gaming videos in Spanish market)
+
+It combines and scores all results, giving you the **most relevant trending games** to help your AI identify viral-worthy clips. Run it before starting the pipeline to get the latest trends!
+
+The output (`output/trending_topics.json`) includes:
+- Top 50 trending games with scores
+- Multi-source validation (games mentioned across platforms)
+- Sample posts/videos mentioning each game
+- Categorization (top seller, new release, etc.)
 
 ## Requirements
 
