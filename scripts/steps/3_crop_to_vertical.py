@@ -128,7 +128,7 @@ def crop_to_vertical():
     """
     
     # Define paths
-    base_dir = Path(__file__).parent.parent
+    base_dir = Path(__file__).parent.parent.parent  # Go up three levels: steps -> scripts -> project root
     candidates_dir = base_dir / "output" / "extracted"
     output_dir = base_dir / "output" / "cropped"
     

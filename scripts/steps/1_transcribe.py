@@ -1,6 +1,10 @@
 import torch
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Fix for PyTorch 2.8 compatibility with pyannote models
 # Monkey-patch torch.load before any other imports
@@ -20,11 +24,20 @@ import json
 
 # Paths
 SCRIPT_DIR = Path(__file__).parent
-PROJECT_ROOT = SCRIPT_DIR.parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent  # Go up two levels: steps -> scripts -> project root
 INPUT_DIR = PROJECT_ROOT / "input"
 OUTPUT_DIR = PROJECT_ROOT / "output"
 TRANSCRIPTS_DIR = OUTPUT_DIR / "transcripts"
-VIDEO_FILE = INPUT_DIR / "notisias.mp4"
+
+# Find the first video file in the input directory
+VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.m4v']
+video_files = [f for f in INPUT_DIR.iterdir() if f.is_file() and f.suffix.lower() in VIDEO_EXTENSIONS]
+
+if not video_files:
+    raise FileNotFoundError(f"No video files found in {INPUT_DIR}. Supported formats: {', '.join(VIDEO_EXTENSIONS)}")
+
+VIDEO_FILE = video_files[0]  # Use the first video file found
+VIDEO_BASE_NAME = VIDEO_FILE.stem  # Get filename without extension
 
 # Create output directories if they don't exist
 TRANSCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -65,13 +78,13 @@ result = whisperx.assign_word_speakers(diarize_segments, result)
 print("\n=== Saving results ===")
 
 # Save full JSON output
-output_json = TRANSCRIPTS_DIR / "notisias_transcript.json"
+output_json = TRANSCRIPTS_DIR / f"{VIDEO_BASE_NAME}_transcript.json"
 with open(output_json, "w", encoding="utf-8") as f:
     json.dump(result, f, indent=2, ensure_ascii=False)
 print(f"Saved JSON: {output_json}")
 
 # Save human-readable transcript with speakers
-output_txt = TRANSCRIPTS_DIR / "notisias_transcript.txt"
+output_txt = TRANSCRIPTS_DIR / f"{VIDEO_BASE_NAME}_transcript.txt"
 with open(output_txt, "w", encoding="utf-8") as f:
     current_speaker = None
     for segment in result["segments"]:
@@ -86,7 +99,7 @@ with open(output_txt, "w", encoding="utf-8") as f:
 print(f"Saved text: {output_txt}")
 
 # Save detailed transcript with timestamps
-output_detailed = TRANSCRIPTS_DIR / "notisias_transcript_detailed.txt"
+output_detailed = TRANSCRIPTS_DIR / f"{VIDEO_BASE_NAME}_transcript_detailed.txt"
 with open(output_detailed, "w", encoding="utf-8") as f:
     for segment in result["segments"]:
         speaker = segment.get("speaker", "Unknown")

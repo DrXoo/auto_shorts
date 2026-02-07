@@ -5,13 +5,20 @@ import re
 
 # Paths
 SCRIPT_DIR = Path(__file__).parent
-PROJECT_ROOT = SCRIPT_DIR.parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent  # Go up two levels: steps -> scripts -> project root
 INPUT_DIR = PROJECT_ROOT / "input"
 OUTPUT_DIR = PROJECT_ROOT / "output"
 CLIPS_DIR = OUTPUT_DIR / "extracted"
 READ_AI_DIR = OUTPUT_DIR / "ai_analysis"
 
-VIDEO_FILE = INPUT_DIR / "notisias.mp4"
+# Find the first video file in the input directory
+VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.m4v']
+video_files = [f for f in INPUT_DIR.iterdir() if f.is_file() and f.suffix.lower() in VIDEO_EXTENSIONS]
+
+if not video_files:
+    raise FileNotFoundError(f"No video files found in {INPUT_DIR}. Supported formats: {', '.join(VIDEO_EXTENSIONS)}")
+
+VIDEO_FILE = video_files[0]  # Use the first video file found
 CLIPS_JSON = READ_AI_DIR / "clips.json"
 
 # Create output directory

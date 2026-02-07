@@ -37,9 +37,18 @@ FINAL_DIR = OUTPUT_DIR / "final"
 TRANSCRIPTS_DIR = OUTPUT_DIR / "transcripts"
 
 # Required files
-VIDEO_FILE = INPUT_DIR / "notisias.mp4"
 CLIPS_JSON = AI_ANALYSIS_DIR / "clips.json"
-TRANSCRIPT_JSON = TRANSCRIPTS_DIR / "notisias_transcript.json"
+
+def get_video_file():
+    """Find the first video file in the input directory"""
+    VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.m4v']
+    video_files = [f for f in INPUT_DIR.iterdir() if f.is_file() and f.suffix.lower() in VIDEO_EXTENSIONS]
+    return video_files[0] if video_files else None
+
+def get_transcript_file():
+    """Find the first transcript JSON file in the transcripts directory"""
+    transcript_files = [f for f in TRANSCRIPTS_DIR.glob("*_transcript.json") if f.is_file()]
+    return transcript_files[0] if transcript_files else None
 
 # Pipeline state file
 STATE_FILE = OUTPUT_DIR / "pipeline_state.json"
@@ -186,9 +195,12 @@ def check_prerequisites(step_num):
     """Check if prerequisites for a step are met"""
     if step_num >= 1:
         # Need video file
-        if not VIDEO_FILE.exists():
-            print_error(f"Video file not found: {VIDEO_FILE}")
+        VIDEO_FILE = get_video_file()
+        if not VIDEO_FILE:
+            print_error(f"No video file found in {INPUT_DIR}")
+            print_info(f"Please add a video file to the input directory")
             return False
+        print_info(f"Using video: {VIDEO_FILE.name}")
     
     if step_num >= 3:
         # Need clips.json
@@ -198,10 +210,12 @@ def check_prerequisites(step_num):
             return False
         
         # Need transcript
-        if not TRANSCRIPT_JSON.exists():
-            print_error(f"Transcript not found: {TRANSCRIPT_JSON}")
+        TRANSCRIPT_JSON = get_transcript_file()
+        if not TRANSCRIPT_JSON:
+            print_error(f"No transcript found in {TRANSCRIPTS_DIR}")
             print_info("Run step 1 first")
             return False
+        print_info(f"Using transcript: {TRANSCRIPT_JSON.name}")
     
     if step_num >= 4:
         # Need extracted clips

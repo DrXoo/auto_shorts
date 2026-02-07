@@ -5,7 +5,7 @@ import re
 
 # Paths
 SCRIPT_DIR = Path(__file__).parent
-PROJECT_ROOT = SCRIPT_DIR.parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent  # Go up two levels: steps -> scripts -> project root
 OUTPUT_DIR = PROJECT_ROOT / "output"
 CANDIDATES_DIR = OUTPUT_DIR / "extracted"
 READY_DIR = OUTPUT_DIR / "cropped"
@@ -14,7 +14,14 @@ READ_AI_DIR = OUTPUT_DIR / "ai_analysis"
 TRANSCRIPTS_DIR = OUTPUT_DIR / "transcripts"
 
 CLIPS_JSON = READ_AI_DIR / "clips.json"
-TRANSCRIPT_JSON = TRANSCRIPTS_DIR / "notisias_transcript.json"
+
+# Find the first transcript JSON file in the transcripts directory
+transcript_files = [f for f in TRANSCRIPTS_DIR.glob("*_transcript.json") if f.is_file()]
+
+if not transcript_files:
+    raise FileNotFoundError(f"No transcript JSON files found in {TRANSCRIPTS_DIR}. Run step 1 (transcribe) first.")
+
+TRANSCRIPT_JSON = transcript_files[0]  # Use the first transcript file found
 
 def parse_timestamp(timestamp_str):
     """Convert MM:SS or HH:MM:SS to seconds"""
