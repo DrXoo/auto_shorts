@@ -47,32 +47,123 @@ class CropPositionFinder:
         self.mouse_y = 0
         self.crop_x = 0
         self.crop_y = 0
-        self.mode = 'single'  # 'single' or 'triple'
+        self.num_speakers = 3  # 3, 4, or 5
+        self.scene_type = 'speakers'  # 'speakers' or 'content'
         self.window_name = "Crop Position Finder"
         
-        # Current crop settings
-        self.single_crop = {'x': 0, 'y': 0, 'width': 810, 'height': 1440}
-        self.triple_crop = [
-            {'x': 100, 'y': 50, 'width': 810, 'height': 480},
-            {'x': 1500, 'y': 50, 'width': 810, 'height': 480},
-            {'x': 800, 'y': 700, 'width': 810, 'height': 480}
-        ]
-        self.selected_region = 0  # For triple mode (0, 1, or 2)
+        # Crop positions for different configurations
+        # Only x, y, and width are stored - height is auto-calculated for 16:9 aspect ratio
+        # vertical=True means 9:16 (portrait), vertical=False means 16:9 (landscape)
         
+        # For 3 speakers
+        self.crop_3_speakers = [
+            {'x': 30, 'y': 30, 'width': 1180, 'vertical': False},
+            {'x': 1342, 'y': 32, 'width': 1180, 'vertical': False},
+            {'x': 684, 'y': 715, 'width': 1180, 'vertical': False}
+        ]
+        self.crop_3_content = {'x': 1728, 'y': 0, 'width': 810, 'vertical': True}  # Portrait for content
+        
+        # For 4 speakers
+        self.crop_4_speakers = [
+            {'x': 30, 'y': 30, 'width': 1180, 'vertical': False},
+            {'x': 1342, 'y': 32, 'width': 1180, 'vertical': False},
+            {'x': 30, 'y': 715, 'width': 1180, 'vertical': False},
+            {'x': 1342, 'y': 715, 'width': 1180, 'vertical': False}
+        ]
+        self.crop_4_content = [
+            {'x': 1600, 'y': 0, 'width': 900, 'vertical': False},
+            {'x': 1600, 'y': 480, 'width': 900, 'vertical': False},
+            {'x': 1600, 'y': 960, 'width': 900, 'vertical': False},
+            {'x': 1600, 'y': 960, 'width': 900, 'vertical': False}
+        ]
+        
+        # For 5 speakers
+        self.crop_5_speakers = [
+            {'x': 58, 'y': 169, 'width': 778, 'vertical': False},
+            {'x': 895, 'y': 160, 'width': 778, 'vertical': False},
+            {'x': 1726, 'y': 160, 'width': 778, 'vertical': False},
+            {'x': 436, 'y': 825, 'width': 778, 'vertical': False},
+            {'x': 1271, 'y': 818, 'width': 778, 'vertical': False}
+        ]
+        self.crop_5_content = [
+            {'x': 54, 'y': 40, 'width': 738, 'vertical': False},
+            {'x': 902, 'y': 40, 'width': 738, 'vertical': False},
+            {'x': 1760, 'y': 40, 'width': 738, 'vertical': False},
+            {'x': 1760, 'y': 505, 'width': 738, 'vertical': False},
+            {'x': 1760, 'y': 969, 'width': 738, 'vertical': False}
+        ]
+        
+        self.selected_region = 0  # Current region being edited
+    
+    def calculate_height(self, width, vertical=False):
+        """Calculate height based on 16:9 aspect ratio"""
+        if vertical:
+            # Portrait: 9:16 ratio (width:height)
+            return int(width * 16 / 9)
+        else:
+            # Landscape: 16:9 ratio (width:height)
+            return int(width * 9 / 16)
+    
+    def get_crop_with_dimensions(self, crop):
+        """Get crop dict with calculated height"""
+        return {
+            'x': crop['x'],
+            'y': crop['y'],
+            'width': crop['width'],
+            'height': self.calculate_height(crop['width'], crop.get('vertical', False))
+        }
+        
+    def get_current_crops(self):
+        """Get the current crop configuration based on speaker count and scene type"""
+        if self.num_speakers == 3:
+            if self.scene_type == 'speakers':
+                return self.crop_3_speakers
+            else:
+                return [self.crop_3_content]  # Wrap in list for consistent handling
+        elif self.num_speakers == 4:
+            return self.crop_4_speakers if self.scene_type == 'speakers' else self.crop_4_content
+        else:  # 5 speakers
+            return self.crop_5_speakers if self.scene_type == 'speakers' else self.crop_5_content
+    
+    def set_crop_position(self, region_idx, x, y):
+        """Set the position for a specific crop region"""
+        if self.num_speakers == 3:
+            if self.scene_type == 'speakers':
+                self.crop_3_speakers[region_idx]['x'] = x
+                self.crop_3_speakers[region_idx]['y'] = y
+            else:
+                self.crop_3_content['x'] = x
+                self.crop_3_content['y'] = y
+        elif self.num_speakers == 4:
+            if self.scene_type == 'speakers':
+                self.crop_4_speakers[region_idx]['x'] = x
+                self.crop_4_speakers[region_idx]['y'] = y
+            else:
+                self.crop_4_content[region_idx]['x'] = x
+                self.crop_4_content[region_idx]['y'] = y
+        else:  # 5 speakers
+            if self.scene_type == 'speakers':
+                self.crop_5_speakers[region_idx]['x'] = x
+                self.crop_5_speakers[region_idx]['y'] = y
+            else:
+                self.crop_5_content[region_idx]['x'] = x
+                self.crop_5_content[region_idx]['y'] = y
+    
     def mouse_callback(self, event, x, y, flags, param):
         """Track mouse position and clicks"""
         self.mouse_x = x
         self.mouse_y = y
         
         if event == cv2.EVENT_LBUTTONDOWN:
-            if self.mode == 'single':
-                self.single_crop['x'] = x
-                self.single_crop['y'] = y
-                print(f"\n✓ Single crop position updated: x={x}, y={y}")
+            crops = self.get_current_crops()
+            if self.num_speakers == 3 and self.scene_type == 'content':
+                # Single crop for 3-speaker content
+                self.set_crop_position(0, x, y)
+                print(f"\n✓ 3-Speaker Content crop position updated: x={x}, y={y}")
             else:
-                self.triple_crop[self.selected_region]['x'] = x
-                self.triple_crop[self.selected_region]['y'] = y
-                print(f"\n✓ Region {self.selected_region + 1} position updated: x={x}, y={y}")
+                # Multi-region crop
+                self.set_crop_position(self.selected_region, x, y)
+                print(f"\n✓ {self.num_speakers}-Speaker {self.scene_type} - Region {self.selected_region + 1} position updated: x={x}, y={y}")
         
         elif event == cv2.EVENT_RBUTTONDOWN:
             # Right click shows pixel color for auto-detection
@@ -86,10 +177,14 @@ class CropPositionFinder:
         """Draw crop areas on the image"""
         display = self.original.copy()
         
-        if self.mode == 'single':
-            # Draw single crop area
-            x, y = self.single_crop['x'], self.single_crop['y']
-            w, h = self.single_crop['width'], self.single_crop['height']
+        crops = self.get_current_crops()
+        
+        # Special case: 3 speakers content scene (single crop)
+        if self.num_speakers == 3 and self.scene_type == 'content':
+            crop = self.get_crop_with_dimensions(crops[0])
+            x, y = crop['x'], crop['y']
+            w, h = crop['width'], crop['height']
+            is_vertical = crops[0].get('vertical', False)
             
             # Draw semi-transparent overlay
             overlay = display.copy()
@@ -100,15 +195,18 @@ class CropPositionFinder:
             cv2.rectangle(display, (x, y), (x + w, y + h), (0, 255, 0), 3)
             
             # Add label
-            cv2.putText(display, f"Single Crop: {w}x{h}", 
+            ratio_text = "9:16" if is_vertical else "16:9"
+            cv2.putText(display, f"Content: {w}x{h} ({ratio_text})", 
                        (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
             cv2.putText(display, f"Position: ({x}, {y})", 
                        (x, y - 45), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
         else:
-            # Draw triple crop areas
-            for i, region in enumerate(self.triple_crop):
-                x, y = region['x'], region['y']
-                w, h = region['width'], region['height']
+            # Draw multiple crop areas
+            for i, region in enumerate(crops):
+                region_with_dims = self.get_crop_with_dimensions(region)
+                x, y = region_with_dims['x'], region_with_dims['y']
+                w, h = region_with_dims['width'], region_with_dims['height']
+                is_vertical = region.get('vertical', False)
                 
                 # Use different color for selected region
                 if i == self.selected_region:
@@ -127,7 +225,8 @@ class CropPositionFinder:
                 cv2.rectangle(display, (x, y), (x + w, y + h), color, thickness)
                 
                 # Add label
-                label = f"Region {i+1}: {w}x{h}"
+                ratio_text = "9:16" if is_vertical else "16:9"
+                label = f"Pos {i+1}: {w}x{h} ({ratio_text})"
                 if i == self.selected_region:
                     label += " [ACTIVE]"
                 cv2.putText(display, label, 
@@ -147,11 +246,14 @@ class CropPositionFinder:
         # Draw instructions
         instructions = [
             "CONTROLS:",
-            "M = Toggle mode (Single/Triple)",
-            "1,2,3 = Select region (Triple mode)",
+            "N = Change # of speakers",
+            "S/C = Scene (Speakers/Content)",
+            "1-5 = Select position",
+            "V = Toggle vertical/horizontal",
+            "+/- = Adjust width",
             "Left Click = Set position",
-            "Right Click = Show pixel color",
-            "C = Copy config to clipboard",
+            "Right Click = Pixel color",
+            "P = Print config",
             "Q = Quit"
         ]
         
@@ -161,9 +263,10 @@ class CropPositionFinder:
                        (10, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
             y_offset += 25
         
-        mode_text = f"MODE: {self.mode.upper()}"
-        if self.mode == 'triple':
-            mode_text += f" - Region {self.selected_region + 1} selected"
+        mode_text = f"{self.num_speakers} SPEAKERS - {self.scene_type.upper()} SCENE"
+        crops = self.get_current_crops()
+        if not (self.num_speakers == 3 and self.scene_type == 'content'):
+            mode_text += f" - Position {self.selected_region + 1}/{len(crops)}"
         cv2.putText(display, mode_text, 
                    (10, display.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
         
@@ -171,41 +274,89 @@ class CropPositionFinder:
     
     def print_config(self):
         """Print the current configuration in Python format"""
-        print("\n" + "=" * 60)
-        print("COPY THIS TO YOUR crop_to_vertical.py FILE:")
-        print("=" * 60)
-        print("\n# Mode 1: Single crop")
-        print("SINGLE_CROP = {")
-        print(f"    'x': {self.single_crop['x']},")
-        print(f"    'y': {self.single_crop['y']},")
-        print(f"    'width': {self.single_crop['width']},")
-        print(f"    'height': {self.single_crop['height']}")
-        print("}")
-        print("\n# Mode 2: Triple crop")
-        print("TRIPLE_CROP = [")
-        for i, region in enumerate(self.triple_crop):
-            print(f"    # Speaker {i+1}")
-            print(f"    {{'x': {region['x']}, 'y': {region['y']}, 'width': {region['width']}, 'height': {region['height']}}},")
-        print("]")
-        print("=" * 60 + "\n")
+        print("\n" + "="*70)
+        print("COPY THIS TO YOUR 3_crop_to_vertical.py FILE:")
+        print("="*70)
+        
+        if self.num_speakers == 3:
+            print("\n# 3 SPEAKERS (height auto-calculated for 16:9)")
+            print("CROP_POSITIONS_3 = {")
+            print("    'speakers': [")
+            for i, region in enumerate(self.crop_3_speakers):
+                region_with_dims = self.get_crop_with_dimensions(region)
+                ratio = "9:16" if region.get('vertical', False) else "16:9"
+                print(f"        {{'x': {region['x']}, 'y': {region['y']}, 'width': {region['width']}, 'height': {region_with_dims['height']}}},  # {ratio}")
+            print("    ],")
+            print("    'content': {")
+            content_with_dims = self.get_crop_with_dimensions(self.crop_3_content)
+            ratio = "9:16" if self.crop_3_content.get('vertical', False) else "16:9"
+            print(f"        'x': {self.crop_3_content['x']},")
+            print(f"        'y': {self.crop_3_content['y']},")
+            print(f"        'width': {self.crop_3_content['width']},")
+            print(f"        'height': {content_with_dims['height']}  # {ratio}")
+            print("    }")
+            print("}")
+        
+        elif self.num_speakers == 4:
+            print("\n# 4 SPEAKERS (height auto-calculated for 16:9)")
+            print("CROP_POSITIONS_4 = {")
+            print("    'speakers': [")
+            for region in self.crop_4_speakers:
+                region_with_dims = self.get_crop_with_dimensions(region)
+                ratio = "9:16" if region.get('vertical', False) else "16:9"
+                print(f"        {{'x': {region['x']}, 'y': {region['y']}, 'width': {region['width']}, 'height': {region_with_dims['height']}}},  # {ratio}")
+            print("    ],")
+            print("    'content': [")
+            for region in self.crop_4_content:
+                region_with_dims = self.get_crop_with_dimensions(region)
+                ratio = "9:16" if region.get('vertical', False) else "16:9"
+                print(f"        {{'x': {region['x']}, 'y': {region['y']}, 'width': {region['width']}, 'height': {region_with_dims['height']}}},  # {ratio}")
+            print("    ]")
+            print("}")
+        
+        else:  # 5 speakers
+            print("\n# 5 SPEAKERS (height auto-calculated for 16:9)")
+            print("CROP_POSITIONS_5 = {")
+            print("    'speakers': [")
+            for region in self.crop_5_speakers:
+                region_with_dims = self.get_crop_with_dimensions(region)
+                ratio = "9:16" if region.get('vertical', False) else "16:9"
+                print(f"        {{'x': {region['x']}, 'y': {region['y']}, 'width': {region['width']}, 'height': {region_with_dims['height']}}},  # {ratio}")
+            print("    ],")
+            print("    'content': [")
+            for region in self.crop_5_content:
+                region_with_dims = self.get_crop_with_dimensions(region)
+                ratio = "9:16" if region.get('vertical', False) else "16:9"
+                print(f"        {{'x': {region['x']}, 'y': {region['y']}, 'width': {region['width']}, 'height': {region_with_dims['height']}}},  # {ratio}")
+            print("    ]")
+            print("}")
+        
+        print("="*70 + "\n")
     
     def run(self):
         """Run the interactive position finder"""
         cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.window_name, self.mouse_callback)
         
-        print("\n" + "=" * 60)
+        print("\n" + "="*70)
         print("CROP POSITION FINDER")
-        print("=" * 60)
+        print("="*70)
+        print(f"\nCurrent: {self.num_speakers} speakers, {self.scene_type} scene")
         print("\nControls:")
-        print("  M = Toggle between Single/Triple mode")
-        print("  1/2/3 = Select region 1/2/3 (in Triple mode)")
-        print("  Left Click = Set position for current crop/region")
+        print("  N = Change number of speakers (3/4/5)")
+        print("  S = Switch to Speakers scene")
+        print("  C = Switch to Content scene")
+        print("  1-5 = Select position to edit")
+        print("  V = Toggle vertical/horizontal aspect ratio")
+        print("  + = Increase width by 10")
+        print("  - = Decrease width by 10")
+        print("  Left Click = Set position for selected crop")
         print("  Right Click = Show pixel color (for auto-detection)")
-        print("  C = Print config to copy")
+        print("  P = Print configuration to copy")
         print("  Q = Quit")
         print("\nMove your mouse to see coordinates, click to set position!")
-        print("=" * 60 + "\n")
+        print("Height is auto-calculated to maintain 16:9 aspect ratio!")
+        print("="*70 + "\n")
         
         while True:
             display = self.draw_overlay()
@@ -215,19 +366,89 @@ class CropPositionFinder:
             
             if key == ord('q') or key == 27:  # Q or ESC
                 break
-            elif key == ord('m'):  # Toggle mode
-                self.mode = 'triple' if self.mode == 'single' else 'single'
-                print(f"\n→ Switched to {self.mode.upper()} mode")
-            elif key == ord('1') and self.mode == 'triple':
+            elif key == ord('n'):  # Change number of speakers
+                print("\nSelect number of speakers:")
+                print("  3 = 3 speakers")
+                print("  4 = 4 speakers")  
+                print("  5 = 5 speakers")
+                num_key = cv2.waitKey(0) & 0xFF
+                if num_key == ord('3'):
+                    self.num_speakers = 3
+                    self.selected_region = 0
+                    print(f"\n→ Switched to 3 speakers")
+                elif num_key == ord('4'):
+                    self.num_speakers = 4
+                    self.selected_region = 0
+                    print(f"\n→ Switched to 4 speakers")
+                elif num_key == ord('5'):
+                    self.num_speakers = 5
+                    self.selected_region = 0
+                    print(f"\n→ Switched to 5 speakers")
+            elif key == ord('s'):  # Speakers scene
+                self.scene_type = 'speakers'
                 self.selected_region = 0
-                print("\n→ Selected Region 1")
-            elif key == ord('2') and self.mode == 'triple':
-                self.selected_region = 1
-                print("\n→ Selected Region 2")
-            elif key == ord('3') and self.mode == 'triple':
-                self.selected_region = 2
-                print("\n→ Selected Region 3")
-            elif key == ord('c'):  # Print config
+                print(f"\n→ Switched to SPEAKERS scene")
+            elif key == ord('c'):  # Content scene
+                self.scene_type = 'content'
+                self.selected_region = 0
+                print(f"\n→ Switched to CONTENT scene")
+            elif key == ord('1'):
+                self.selected_region = 0
+                print(f"\n→ Selected Position 1")
+            elif key == ord('2'):
+                crops = self.get_current_crops()
+                if len(crops) > 1:
+                    self.selected_region = 1
+                    print(f"\n→ Selected Position 2")
+            elif key == ord('3'):
+                crops = self.get_current_crops()
+                if len(crops) > 2:
+                    self.selected_region = 2
+                    print(f"\n→ Selected Position 3")
+            elif key == ord('4'):
+                crops = self.get_current_crops()
+                if len(crops) > 3:
+                    self.selected_region = 3
+                    print(f"\n→ Selected Position 4")
+            elif key == ord('5'):
+                crops = self.get_current_crops()
+                if len(crops) > 4:
+                    self.selected_region = 4
+                    print(f"\n→ Selected Position 5")
+            elif key == ord('v'):  # Toggle vertical/horizontal
+                crops = self.get_current_crops()
+                if self.num_speakers == 3 and self.scene_type == 'content':
+                    self.crop_3_content['vertical'] = not self.crop_3_content.get('vertical', False)
+                    ratio = "9:16" if self.crop_3_content['vertical'] else "16:9"
+                    print(f"\n→ Toggled to {ratio} aspect ratio")
+                else:
+                    current_crop = crops[self.selected_region]
+                    current_crop['vertical'] = not current_crop.get('vertical', False)
+                    ratio = "9:16" if current_crop['vertical'] else "16:9"
+                    print(f"\n→ Position {self.selected_region + 1} toggled to {ratio}")
+            elif key == ord('+') or key == ord('='):  # Increase width
+                crops = self.get_current_crops()
+                if self.num_speakers == 3 and self.scene_type == 'content':
+                    self.crop_3_content['width'] += 10
+                    new_height = self.calculate_height(self.crop_3_content['width'], self.crop_3_content.get('vertical', False))
+                    print(f"\n→ Width increased to {self.crop_3_content['width']} (height: {new_height})")
+                else:
+                    current_crop = crops[self.selected_region]
+                    current_crop['width'] += 10
+                    new_height = self.calculate_height(current_crop['width'], current_crop.get('vertical', False))
+                    print(f"\n→ Position {self.selected_region + 1} width: {current_crop['width']} (height: {new_height})")
+            elif key == ord('-') or key == ord('_'):  # Decrease width
+                crops = self.get_current_crops()
+                if self.num_speakers == 3 and self.scene_type == 'content':
+                    self.crop_3_content['width'] = max(10, self.crop_3_content['width'] - 10)
+                    new_height = self.calculate_height(self.crop_3_content['width'], self.crop_3_content.get('vertical', False))
+                    print(f"\n→ Width decreased to {self.crop_3_content['width']} (height: {new_height})")
+                else:
+                    current_crop = crops[self.selected_region]
+                    current_crop['width'] = max(10, current_crop['width'] - 10)
+                    new_height = self.calculate_height(current_crop['width'], current_crop.get('vertical', False))
+                    print(f"\n→ Position {self.selected_region + 1} width: {current_crop['width']} (height: {new_height})")
+            elif key == ord('p'):  # Print config
                 self.print_config()
         
         cv2.destroyAllWindows()
@@ -235,15 +456,24 @@ class CropPositionFinder:
 
 def main():
     # Get video file
-    base_dir = Path(__file__).parent.parent
-    candidates_dir = base_dir / "output" / "candidates"
+    base_dir = Path(__file__).parent.parent.parent
+    extracted_dir = base_dir / "output" / "extracted"
     
-    video_files = list(candidates_dir.glob("*.mp4"))
+    # Also check input folder as fallback
+    input_dir = base_dir / "input"
     
+    video_files = list(extracted_dir.glob("*.mp4"))
     if not video_files:
-        print("No video files found in candidates folder!")
-        print(f"Looking in: {candidates_dir}")
-        return
+        video_files = list(input_dir.glob("*.mp4"))
+        if not video_files:
+            print("No video files found!")
+            print(f"Checked: {extracted_dir}")
+            print(f"Checked: {input_dir}")
+            return
+        else:
+            print(f"Using videos from: {input_dir}")
+    else:
+        print(f"Using videos from: {extracted_dir}")
     
     print("\nAvailable videos:")
     for i, video in enumerate(video_files, 1):

@@ -5,8 +5,11 @@ You are analyzing a Spanish gaming podcast transcript to identify the best segme
 
 **Podcast Details:**
 - Language: Spanish
-- Format: 3 people discussing videogames (can be more depending on the topic)
+- Format: 3 people discussing videogames (can be more depending on the topic, when having guests)
 - Speakers: each speaker will have a name like SPEAKER_01, SPEAKER_02, SPEAKER_00 (and possibly others)
+
+**Episode Topic:**
+REMEMBER WRITE THE TOPIC
 
 ## INSTRUCTIONS
 

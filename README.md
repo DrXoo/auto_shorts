@@ -20,6 +20,24 @@ Video Input
 Final Shorts Ready! 🎉
 ```
 
+## ✨ Key Features
+
+- **🎙️ Speaker-Aware Dynamic Cropping** - Intelligently shows 3 speakers at a time in episodes with 4-5 people, based on who's talking
+- **🎯 Speaker Diarization** - Automatically identifies different speakers in your podcast
+- **🤖 AI-Powered Clip Selection** - Provide clips.json for intelligent moment extraction
+- **📱 Vertical Format Optimization** - Perfect 9:16 for Instagram Reels, TikTok, and YouTube Shorts
+- **📝 Karaoke-Style Subtitles** - Word-by-word highlighting for maximum engagement
+- **🔄 Multi-Scene Support** - Auto-detection or manual selection for different camera layouts
+- **🎮 Trending Topics Integration** - Fetch gaming trends from Reddit, Steam, and YouTube
+- **⚡ GPU-Accelerated** - Fast transcription with CUDA support
+
+### 🆕 Speaker-Aware Mode (4-5 Speakers)
+For episodes with 4-5 people, the system analyzes the transcript and dynamically shows the 3 most relevant speakers at any given moment (active speaker + recently active ones). This works for BOTH scene types:
+- **Speakers scene**: 3 most active in full discussion layout
+- **Content scene**: Same 3 most active but with different crop positions/sizes to fit the content
+
+See [SPEAKER_CONFIG_GUIDE.md](SPEAKER_CONFIG_GUIDE.md) for setup instructions.
+
 ## Quick Start
 
 ### Run Full Pipeline
@@ -181,6 +199,10 @@ Edit `scripts/steps/4_add_subtitles.py` to customize:
 Edit `scripts/steps/3_crop_to_vertical.py` to adjust:
 - Single crop position (content sharing mode)
 - Triple crop positions (speaker triangle mode)
+- **Multi-speaker dynamic mode (4-5 people)** - See [SPEAKER_CONFIG_GUIDE.md](SPEAKER_CONFIG_GUIDE.md)
+  - Configure number of speakers per episode
+  - Map speaker IDs to camera positions
+  - Adjust crop coordinates for your setup
 - Auto-detection settings
 
 ## Output
