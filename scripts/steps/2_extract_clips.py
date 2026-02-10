@@ -26,18 +26,9 @@ CLIPS_DIR.mkdir(parents=True, exist_ok=True)
 
 print("=== Extracting Video Clips with FFmpeg ===\n")
 
-def parse_timestamp(timestamp_str):
-    """Convert MM:SS or HH:MM:SS to seconds"""
-    parts = timestamp_str.split(':')
-    
-    if len(parts) == 2:  # MM:SS
-        minutes, seconds = parts
-        return int(minutes) * 60 + int(seconds)
-    elif len(parts) == 3:  # HH:MM:SS
-        hours, minutes, seconds = parts
-        return int(hours) * 3600 + int(minutes) * 60 + int(seconds)
-    else:
-        raise ValueError(f"Invalid timestamp format: {timestamp_str}")
+def parse_timestamp(timestamp):
+    """Convert timestamp to seconds"""
+    return float(timestamp)
 
 def sanitize_filename(title):
     """Clean title to make it a valid filename"""

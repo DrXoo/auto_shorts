@@ -66,9 +66,9 @@ Provide a JSON array with ALL clips. Each clip must include:
 [
   {
     "clip_number": 1,
-    "start_time": "2:30",
-    "end_time": "3:15",
-    "duration_seconds": 45,
+    "start_time": 150.5,
+    "end_time": 195.0,
+    "duration_seconds": 44.5,
     "speakers": ["SPEAKER_01", "SPEAKER_02"],
     "title": "Catchy title for the clip",
     "description": "Brief description of what happens",
@@ -78,9 +78,9 @@ Provide a JSON array with ALL clips. Each clip must include:
   },
   {
     "clip_number": 2,
-    "start_time": "5:45",
-    "end_time": "6:30",
-    "duration_seconds": 45,
+    "start_time": 345.0,
+    "end_time": 390.0,
+    "duration_seconds": 45.0,
     "speakers": ["SPEAKER_00", "SPEAKER_01", "SPEAKER_02"],
     "title": "Another clip title",
     "description": "What happens in this clip",
@@ -91,15 +91,12 @@ Provide a JSON array with ALL clips. Each clip must include:
 ]
 ```
 
-**IMPORTANT TIME FORMAT RULES:**
-- Format: "M:SS" or "MM:SS" (NO leading zeros on minutes)
-- Examples: "2:30" (correct), "02:30" (wrong), "15:45" (correct)
-- To convert from seconds to time:
-  - Minutes = floor(seconds ÷ 60)
-  - Seconds = seconds mod 60
-  - Example: 150 seconds = "2:30" (150 ÷ 60 = 2 minutes, 30 seconds remaining)
-- `start_time` = convert the FIRST segment_start_second in the clip
-- `end_time` = convert the LAST segment_end_second in the clip
+**IMPORTANT TIME RULES:**
+- Use seconds as numbers (floats), exactly as they appear in the transcript
+- `start_time` = the FIRST segment_start_second in the clip (e.g., 150.5)
+- `end_time` = the LAST segment_end_second in the clip (e.g., 195.0)
+- `duration_seconds` = end_time - start_time
+- Keep decimal precision from the transcript timestamps
 
 **SPEAKERS FIELD:**
 - List all unique speakers who talk in this clip
@@ -118,11 +115,11 @@ Rank clips by:
 
 **Input transcript fragment:**
 ```
-[150.5 - 153.2] SPEAKER_01: ¡No puedo creer que hayan hecho eso!
-[153.5 - 156.8] SPEAKER_02: Es la peor decisión que han tomado.
-[157.0 - 162.5] SPEAKER_01: Literal, van a perder millones de jugadores.
-[163.0 - 168.2] SPEAKER_03: Bueno, pero hay que ver el lado positivo...
-[168.5 - 174.8] SPEAKER_02: ¿Qué lado positivo? Esto es un desastre total.
+[150.5s - 153.2s] SPEAKER_01: ¡No puedo creer que hayan hecho eso!
+[153.5s - 156.8s] SPEAKER_02: Es la peor decisión que han tomado.
+[157.0s - 162.5s] SPEAKER_01: Literal, van a perder millones de jugadores.
+[163.0s - 168.2s] SPEAKER_03: Bueno, pero hay que ver el lado positivo...
+[168.5s - 174.8s] SPEAKER_02: ¿Qué lado positivo? Esto es un desastre total.
 ```
 
 **Output:**
@@ -130,9 +127,9 @@ Rank clips by:
 [
   {
     "clip_number": 1,
-    "start_time": "2:30",
-    "end_time": "2:54",
-    "duration_seconds": 24,
+    "start_time": 150.5,
+    "end_time": 174.8,
+    "duration_seconds": 24.3,
     "speakers": ["SPEAKER_01", "SPEAKER_02", "SPEAKER_03"],
     "title": "La PEOR Decisión de la Historia",
     "description": "Los hosts reaccionan con incredulidad a una decisión polémica",

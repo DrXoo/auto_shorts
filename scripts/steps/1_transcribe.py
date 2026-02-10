@@ -77,10 +77,14 @@ result = whisperx.assign_word_speakers(diarize_segments, result)
 # Save results
 print("\n=== Saving results ===")
 
-# Save full JSON output
+# Save JSON output (segments only, exclude word_segments to reduce file size)
 output_json = TRANSCRIPTS_DIR / f"{VIDEO_BASE_NAME}_transcript.json"
 with open(output_json, "w", encoding="utf-8") as f:
-    json.dump(result, f, indent=2, ensure_ascii=False)
+    # Only save segments array, not word_segments (reduces file size by ~50%)
+    filtered_result = {
+        "segments": result["segments"]
+    }
+    json.dump(filtered_result, f, indent=2, ensure_ascii=False)
 print(f"Saved JSON: {output_json}")
 
 # Save human-readable transcript with speakers

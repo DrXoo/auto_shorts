@@ -279,20 +279,12 @@ def get_clip_timestamps(clip_file, base_dir):
         # Find the matching clip
         for clip in clips_data:
             if clip.get('clip_number') == clip_number:
-                start_time_str = clip.get('start_time', '')
-                end_time_str = clip.get('end_time', '')
+                start_time_str = clip.get('start_time', 0)
+                end_time_str = clip.get('end_time', 0)
                 
-                # Parse time strings (format: "MM:SS" or "HH:MM:SS")
-                def parse_time(time_str):
-                    parts = time_str.split(':')
-                    if len(parts) == 2:  # MM:SS
-                        return int(parts[0]) * 60 + int(parts[1])
-                    elif len(parts) == 3:  # HH:MM:SS
-                        return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-                    return 0
-                
-                start_seconds = parse_time(start_time_str)
-                end_seconds = parse_time(end_time_str)
+                # Convert to float (timestamps are now in seconds)
+                start_seconds = float(start_time_str)
+                end_seconds = float(end_time_str)
                 
                 return (start_seconds, end_seconds)
         

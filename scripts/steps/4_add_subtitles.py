@@ -23,18 +23,9 @@ if not transcript_files:
 
 TRANSCRIPT_JSON = transcript_files[0]  # Use the first transcript file found
 
-def parse_timestamp(timestamp_str):
-    """Convert MM:SS or HH:MM:SS to seconds"""
-    parts = timestamp_str.split(':')
-    
-    if len(parts) == 2:  # MM:SS
-        minutes, seconds = parts
-        return int(minutes) * 60 + float(seconds)
-    elif len(parts) == 3:  # HH:MM:SS
-        hours, minutes, seconds = parts
-        return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
-    else:
-        raise ValueError(f"Invalid timestamp format: {timestamp_str}")
+def parse_timestamp(timestamp):
+    """Convert timestamp to seconds"""
+    return float(timestamp)
 
 def seconds_to_ass_time(seconds):
     """Convert seconds to ASS subtitle format: H:MM:SS.CC"""
