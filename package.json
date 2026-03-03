@@ -1,0 +1,12 @@
+{
+  "name": "autoshorts",
+  "version": "1.0.0",
+  "description": "Automated pipeline to convert podcast videos into vertical shorts ready for Instagram, TikTok, and YouTube Shorts.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,275 @@
+  # TASK: Extract Compelling Intro Hooks from Podcast
+
+  ## CONTEXT
+  You are analyzing a Spanish gaming podcast transcript to identify the most engaging moments suitable for creating a compelling intro/teaser video - the kind of hooks that make viewers want to watch the full episode.
+
+  **Podcast Details:**
+  - Language: Spanish
+  - Format: 3 people discussing videogames (can be more depending on the topic, when having guests)
+  - Speakers: each speaker will have a name like SPEAKER_01, SPEAKER_02, SPEAKER_00 (and possibly others)
+
+  **Purpose:**
+  Create a short compilation of the most captivating moments that:
+  - Build anticipation and curiosity
+  - Showcase controversy or strong opinions
+  - Present cliffhangers or shocking statements
+  - Highlight passionate reactions or debates
+  - Tease interesting topics without revealing everything
+
+  ## INSTRUCTIONS
+
+  ### 1. IDENTIFY HOOK MOMENTS (<20 seconds>)
+
+  Look for segments that have:
+
+  **HOOK TYPES:**
+
+  **🔥 Strong Opinions / Hot Takes:**
+  - Bold statements about games or industry
+  - Controversial viewpoints
+  - "This is the best/worst..." declarations
+  - Unpopular opinions
+  - Direct challenges to popular beliefs
+
+  **😱 Shocking Statements / Cliffhangers:**
+  - Surprising revelations or news
+  - "You won't believe what happened..."
+  - Unexpected twists in the conversation
+  - Dramatic build-ups
+  - Teasers that create curiosity
+
+  **💥 Passionate Reactions:**
+  - Extreme excitement or disappointment
+  - Genuine surprise or disbelief
+  - Frustration or anger (constructive)
+  - Laughter at absurd situations
+  - Emotional intensity
+
+  **🎯 Debates / Disagreements:**
+  - Clear opposing viewpoints
+  - Friendly arguments
+  - "I completely disagree because..."
+  - Back-and-forth exchanges (keep short and punchy)
+  - Tension in the conversation
+
+  **🚀 Bold Predictions / Claims:**
+  - "This will change everything..."
+  - Industry predictions
+  - Game release speculations
+  - "Mark my words..." statements
+
+  **🎬 Intriguing Questions:**
+  - Rhetorical questions that hook attention
+  - "What if..." scenarios
+  - Questions that challenge assumptions
+  - Mystery-building queries
+
+  ### 2. TECHNICAL REQUIREMENTS
+
+  **Duration:**
+  - Each hook: <20 seconds (ideal: <10 seconds)
+  - Aim for 10-15 individual hooks
+  - **CUT TO THE CORE** - Only the most impactful moment, nothing extra
+
+  **Quality Standards:**
+  - **ULTRA PUNCHY:** Cut directly to the impactful statement - no setup, no context
+  - **ONE KEY MOMENT:** Each hook = ONE powerful statement or reaction
+  - **Maximum impact:** Every second must grab attention
+  - **High energy:** Engaging delivery and content
+  - **Natural boundaries:** Start and end at natural conversation breaks (but keep it TIGHT)
+  - **Clear audio:** Not too many overlapping voices
+  - **Variety:** Mix different types of hooks for dynamic pacing
+  - **NO FLUFF:** If a word doesn't add impact, cut it
+
+  **Sequencing Strategy:**
+  - Start with the STRONGEST hook (most shocking/intriguing)
+  - Alternate between different hook types
+  - Build energy throughout the compilation
+  - End with a cliffhanger or call-to-action feel
+
+  ### 3. AVOID
+
+  - Long explanations or context-heavy segments
+  - ANY setup or exposition - jump straight to the punch
+  - Slow pacing or monotone delivery
+  - Inside jokes requiring background knowledge
+  - Technical jargon without context
+  - Moments that give away too much (save mystery)
+  - Cutting mid-sentence or mid-word
+  - Repetitive content (similar hooks)
+  - Hooks longer than 8 seconds (exceptions ONLY for extraordinary moments)
+
+  ### 4. INPUT FORMAT
+
+  The transcript is provided with timestamps in seconds:
+
+  ```
+  [START_TIME] SPEAKER_NAME: dialogue text here
+  ```
+
+  Example:
+  ```
+  [145.5] SPEAKER_01: No puedo creer que Nintendo haya hecho esto
+  [148.2] SPEAKER_00: Es literalmente el peor anuncio del año
+  ```
+
+  ### 5. OUTPUT FORMAT
+
+  Provide your analysis in JSON format with this exact structure:
+
+  ```json
+  {
+    "hooks": [
+      {
+        "hook_number": 1,
+        "type": "shocking_statement",
+        "title": "Worst Announcement Ever",
+        "start_time": "148.2",
+        "end_time": "153.1",
+        "duration": 4.9,
+        "text": "Es literalmente el peor anuncio del año.",
+        "reason": "Direct, controversial statement that immediately grabs attention",
+        "energy_level": "explosive"
+      }
+    ]
+  }
+  ```
+
+  ### 6. HOOK TYPE REFERENCE
+
+  Use these standardized types in your JSON output:
+
+  - `"strong_opinion"` - Bold takes and declarations
+  - `"shocking_statement"` - Surprising revelations
+  - `"passionate_reaction"` - Emotional responses
+  - `"debate"` - Disagreements and arguments
+  - `"bold_prediction"` - Future claims and speculation
+  - `"intriguing_question"` - Hook-building questions
+  - `"cliffhanger"` - Statements that build suspense
+
+  ### 7. ENERGY LEVEL GUIDE
+
+  Rate each hook's energy:
+  - `"low"` - Calm but intriguing (use sparingly)
+  - `"medium"` - Engaged, interesting
+  - `"high"` - Excited, passionate, intense
+  - `"explosive"` - Peak excitement or controversy
+
+  Aim for mostly "high" and "explosive" energy levels in hooks.
+
+  ### 8. QUALITY CHECKLIST
+
+  Before finalizing each hook, verify:
+
+  ✓ Duration is <20 seconds (shorter is better!)
+  ✓ Contains ONLY the core impactful statement
+  ✓ Starts and ends at natural conversation breaks
+  ✓ Makes sense without additional context
+  ✓ Has clear, engaging delivery
+  ✓ Represents one of the hook types
+  ✓ Doesn't require prior episode knowledge
+  ✓ Audio is clear (not too many overlapping voices)
+  ✓ Creates curiosity or strong emotion
+  ✓ NO setup, NO context - pure impact
+  ✓ Ask yourself: "Can I cut this shorter?" If yes, DO IT
+
+  ## STRATEGY TIPS
+
+  **Building a Great Compilation:**
+
+  1. **Opening (First 2-3 hooks):**
+    - Lead with absolute STRONGEST moment
+    - Create immediate intrigue
+    - Set the tone for controversy/excitement
+
+  2. **Middle (Next 4-6 hooks):**
+    - Mix different types for variety
+    - Maintain high energy
+    - Build narrative tension
+
+  3. **Closing (Last 2-3 hooks):**
+    - Peak moments or satisfying climax
+    - End with cliffhanger to drive interest
+    - Leave them wanting more
+
+  4. **Transitions:**
+    - Consider how hooks flow together
+    - Vary speakers for dynamic feel
+    - Create rhythm (don't cluster same type)
+
+  ## EXAMPLE OUTPUT
+
+  Here's an example of a well-structured hooks compilation:
+
+  ```json
+  {
+    "hooks": [
+      {
+        "hook_number": 1,
+        "type": "shocking_statement",
+        "title": "Worst Decision Ever",
+        "start_time": "342.1",
+        "end_time": "346.8",
+        "duration": 4.7,
+        "text": "Esto es lo peor que ha hecho Sony en toda su historia.",
+        "reason": "Immediately controversial - pure impact, no fluff",
+        "energy_level": "explosive"
+      },
+      {
+        "hook_number": 2,
+        "type": "debate",
+        "title": "Heated Disagreement",
+        "start_time": "567.2",
+        "end_time": "572.4",
+        "duration": 5.2,
+        "text": "¡Estás completamente equivocado! Este juego es perfecto.",
+        "reason": "Sharp disagreement, cut to the heated exchange only",
+        "energy_level": "high"
+      },
+      {
+        "hook_number": 3,
+        "type": "bold_prediction",
+        "title": "Game Changing Prediction",
+        "start_time": "895.3",
+        "end_time": "900.1",
+        "duration": 4.8,
+        "text": "Nintendo va a anunciar algo que va a cambiar la industria para siempre.",
+        "reason": "Bold claim, cut the setup, keep only the punch",
+        "energy_level": "high"
+      },
+      {
+        "hook_number": 4,
+        "type": "passionate_reaction",
+        "title": "Can't Believe It",
+        "start_time": "1025.7",
+        "end_time": "1029.2",
+        "duration": 3.5,
+        "text": "¡No me lo puedo creer!",
+        "reason": "Pure reaction - maximum emotion in minimum time",
+        "energy_level": "explosive"
+      }
+    ],
+    "compilation_strategy": {
+      "total_duration": 18.2,
+      "opening_hook": 1,
+      "closing_hook": 4,
+      "pacing_notes": "Rapid-fire punches. Each hook is a knockout. Zero fat, all muscle."
+    },
+    "metadata": {
+      "total_hooks": 4,
+      "dominant_theme": "Industry controversy and future speculation",
+      "recommended_music": "High-intensity electronic with aggressive beats"
+    }
+  }
+  ```
+
+  ## FINAL NOTES
+
+  - Prioritize IMPACT over everything - cut ruthlessly to the core moment
+  - Each hook should feel like a punch - quick, powerful, memorable
+  - Think TikTok/Instagram Reels pacing - fast, addictive, impossible to ignore
+  - The compilation should feel like a movie trailer on steroids - pure adrenaline
+  - When in doubt: CUT IT SHORTER. Then cut it shorter again.
+  - Ask: "What's the absolute minimum to deliver maximum impact?"
+
+  **Remember:** Attention spans are 3 seconds. Every hook must grab viewers INSTANTLY. This isn't just another clip - it's THE reason someone decides to watch the full episode. Make every MILLISECOND count!
