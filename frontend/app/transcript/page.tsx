@@ -9,6 +9,9 @@ import {
   Search,
   Play,
   ChevronDown,
+  Replace,
+  Plus,
+  X,
 } from "lucide-react";
 import {
   transcript as transcriptApi,
@@ -119,6 +122,14 @@ export default function TranscriptPage() {
   const [mergeOpen, setMergeOpen] = useState(false);
   const [mergeSource, setMergeSource] = useState("");
   const [mergeTarget, setMergeTarget] = useState("");
+
+  // Fix words modal
+  const [fixWordsOpen, setFixWordsOpen] = useState(false);
+  const [wordPairs, setWordPairs] = useState<{ find: string; replace: string }[]>([
+    { find: "", replace: "" },
+  ]);
+  const [fixWordsWorking, setFixWordsWorking] = useState(false);
+  const [fixWordsResult, setFixWordsResult] = useState<string | null>(null);
 
   // Video ref
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -249,6 +260,24 @@ export default function TranscriptPage() {
     }
   };
 
+  // Fix words
+  const handleFixWords = async () => {
+    const validPairs = wordPairs.filter((p) => p.find.trim());
+    if (!validPairs.length) return;
+    setFixWordsWorking(true);
+    setFixWordsResult(null);
+    try {
+      const res = await transcriptApi.replaceWords(validPairs);
+      setFixWordsResult(res.message);
+      setDirty(false);
+      refresh();
+    } catch {
+      setFixWordsResult("Error applying replacements");
+    } finally {
+      setFixWordsWorking(false);
+    }
+  };
+
   // Seek video to timestamp
   const seekTo = (time: number) => {
     if (videoRef.current) {
@@ -294,6 +323,17 @@ export default function TranscriptPage() {
             style={{ background: "var(--card)", border: "1px solid var(--border)" }}
           >
             <Merge size={14} /> Merge Speakers
+          </button>
+          <button
+            onClick={() => {
+              setFixWordsResult(null);
+              setWordPairs([{ find: "", replace: "" }]);
+              setFixWordsOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors"
+            style={{ background: "var(--card)", border: "1px solid var(--border)" }}
+          >
+            <Replace size={14} /> Fix Words
           </button>
           <button
             onClick={handleFixConsistency}
@@ -464,6 +504,92 @@ export default function TranscriptPage() {
           );
         })}
       </div>
+
+      {/* Fix Words Modal */}
+      {fixWordsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)" }}>
+          <div className="rounded-xl p-6 w-[480px] space-y-4" style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Replace size={18} /> Fix Words
+            </h3>
+            <p className="text-xs" style={{ color: "var(--muted)" }}>
+              Find and replace words or phrases across the entire transcript.
+              Matching is case-insensitive; the replacement will use the casing you type.
+            </p>
+
+            {/* Pairs list */}
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {wordPairs.map((pair, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    value={pair.find}
+                    onChange={(e) => {
+                      const updated = [...wordPairs];
+                      updated[i] = { ...updated[i], find: e.target.value };
+                      setWordPairs(updated);
+                    }}
+                    placeholder="Find…"
+                    className="flex-1 rounded px-2 py-1.5 text-xs"
+                    style={{ background: "var(--background)", border: "1px solid var(--border)" }}
+                  />
+                  <span className="text-xs" style={{ color: "var(--muted)" }}>→</span>
+                  <input
+                    value={pair.replace}
+                    onChange={(e) => {
+                      const updated = [...wordPairs];
+                      updated[i] = { ...updated[i], replace: e.target.value };
+                      setWordPairs(updated);
+                    }}
+                    placeholder="Replace with…"
+                    className="flex-1 rounded px-2 py-1.5 text-xs"
+                    style={{ background: "var(--background)", border: "1px solid var(--border)" }}
+                  />
+                  <button
+                    onClick={() => setWordPairs(wordPairs.filter((_, j) => j !== i))}
+                    className="p-1 rounded hover:opacity-70"
+                    style={{ color: "var(--muted)" }}
+                    title="Remove"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setWordPairs([...wordPairs, { find: "", replace: "" }])}
+              className="flex items-center gap-1.5 text-xs hover:opacity-70"
+              style={{ color: "var(--accent)" }}
+            >
+              <Plus size={13} /> Add pair
+            </button>
+
+            {fixWordsResult && (
+              <p className="text-xs px-2 py-1.5 rounded" style={{ background: "var(--background)", color: "var(--muted)" }}>
+                {fixWordsResult}
+              </p>
+            )}
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => { setFixWordsOpen(false); setFixWordsResult(null); }}
+                className="px-4 py-2 rounded-lg text-sm"
+                style={{ border: "1px solid var(--border)" }}
+              >
+                Close
+              </button>
+              <button
+                onClick={handleFixWords}
+                disabled={fixWordsWorking || !wordPairs.some((p) => p.find.trim())}
+                className="px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40"
+                style={{ background: "var(--accent)", color: "#fff" }}
+              >
+                {fixWordsWorking ? "Applying..." : "Apply"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Merge Modal */}
       {mergeOpen && (

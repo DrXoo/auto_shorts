@@ -126,6 +126,11 @@ export const transcript = {
     }),
   fixConsistency: () =>
     request("/api/transcript/fix-consistency", { method: "POST" }),
+  replaceWords: (replacements: { find: string; replace: string }[]) =>
+    request<{ message: string; total_replaced: number }>(
+      "/api/transcript/replace-words",
+      { method: "POST", body: JSON.stringify({ replacements }) }
+    ),
   save: (data: TranscriptData) =>
     request("/api/transcript/save", {
       method: "POST",
@@ -213,6 +218,52 @@ export const media = {
 
 // ─── Tools ────────────────────────────────────────────────────────
 
+// ─── Editor / Composition types ───────────────────────────────────
+
+export interface CropRegion {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export type ContentLayout = "fullscreen" | "split_top" | "split_bottom";
+
+export interface ContentSegment {
+  start: number;
+  end: number;
+  content_region: CropRegion;
+  speaker_region?: CropRegion | null;
+  layout: ContentLayout;
+}
+
+export interface EditorRenderRequest {
+  video_path: string;
+  segments: ContentSegment[];
+  default_speaker_region: CropRegion;
+  output_name?: string;
+  output_width?: number;
+  output_height?: number;
+}
+
+export interface EditorVideoInfo {
+  name: string;
+  path: string;
+  width: number;
+  height: number;
+  duration: number;
+  codec: string;
+  size: number;
+}
+
+export interface EditorComposition {
+  video_path: string;
+  segments: ContentSegment[];
+  default_speaker_region?: CropRegion | null;
+  output_width?: number;
+  output_height?: number;
+}
+
 export const tools = {
   cutVideo: (params: { video_path: string; start_time: number; end_time: number; output_name?: string; output_to_input?: boolean }) =>
     request("/api/tools/cut-video", {
@@ -244,6 +295,28 @@ export const tools = {
     if (!res.ok) throw new Error(await res.text());
     return res.json();
   },
+
+  // ── Editor ────────────────────────────────────────────────────────
+  editorVideoInfo: (videoPath: string) =>
+    request<EditorVideoInfo>(
+      `/api/tools/editor/video-info?video_path=${encodeURIComponent(videoPath)}`
+    ),
+  editorFrameUrl: (videoPath: string, timeSec: number) =>
+    `${API_BASE}/api/tools/editor/frame?video_path=${encodeURIComponent(videoPath)}&time_sec=${timeSec}`,
+  editorRender: (req: EditorRenderRequest) =>
+    request<{ status: string; video: string }>("/api/tools/editor/render", {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  editorSave: (composition: EditorComposition) =>
+    request<{ status: string; file: string }>("/api/tools/editor/save", {
+      method: "POST",
+      body: JSON.stringify(composition),
+    }),
+  editorLoad: (videoPath: string) =>
+    request<{ exists: boolean; composition: EditorComposition | null }>(
+      `/api/tools/editor/load?video_path=${encodeURIComponent(videoPath)}`
+    ),
 };
 
 // ─── Config ───────────────────────────────────────────────────────

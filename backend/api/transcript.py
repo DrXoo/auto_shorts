@@ -15,6 +15,7 @@ from backend.models import (
     SpeakerRenameRequest,
     SegmentSpeakerUpdate,
     Transcript,
+    WordReplaceRequest,
 )
 
 router = APIRouter(prefix="/api/transcript", tags=["transcript"])
@@ -136,6 +137,46 @@ def rename_speaker(body: SpeakerRenameRequest):
 
     _save_transcript(path, data)
     return {"message": f"Renamed {body.old_name} → {body.new_name}", "segments_changed": changed}
+
+
+# ─── Bulk word find-and-replace ────────────────────────────────────
+
+@router.post("/replace-words")
+def replace_words(body: WordReplaceRequest):
+    """
+    Bulk find-and-replace words/phrases across every segment.
+    Fixes common transcription errors (e.g. 'gonna' → 'going to').
+    Matches are case-insensitive; replacement preserves the given casing.
+    Both segment .text and individual word tokens are updated.
+    """
+    import re
+    path, data = _load_transcript()
+    total_replaced = 0
+
+    for seg in data.get("segments", []):
+        # Replace in the segment's full-text string
+        for rep in body.replacements:
+            if not rep.find.strip():
+                continue
+            pattern = re.compile(re.escape(rep.find), re.IGNORECASE)
+            new_text, n = pattern.subn(rep.replace, seg.get("text", ""))
+            if n:
+                seg["text"] = new_text
+                total_replaced += n
+
+        # Replace in individual word tokens (exact token match)
+        for word in seg.get("words", []):
+            raw = word.get("word", "")
+            for rep in body.replacements:
+                if not rep.find.strip():
+                    continue
+                if raw.strip().lower() == rep.find.strip().lower():
+                    # Preserve leading/trailing whitespace the token may have
+                    stripped = raw.strip()
+                    word["word"] = raw.replace(stripped, rep.replace)
+
+    _save_transcript(path, data)
+    return {"message": f"Replaced {total_replaced} occurrence(s)", "total_replaced": total_replaced}
 
 
 # ─── Fix word-level consistency ─────────────────────────────────────

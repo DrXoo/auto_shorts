@@ -100,15 +100,21 @@ export default function ToolsPage() {
   // Available files
   const [inputFiles, setInputFiles] = useState<string[]>([]);
   const [extractedFiles, setExtractedFiles] = useState<string[]>([]);
+  const [croppedFiles, setCroppedFiles] = useState<string[]>([]);
+  const [finalFiles, setFinalFiles] = useState<string[]>([]);
 
   // Load files on mount
   useState(() => {
     Promise.all([
       media.listFiles("input"),
       media.listFiles("extracted"),
-    ]).then(([inp, ext]) => {
+      media.listFiles("cropped"),
+      media.listFiles("final"),
+    ]).then(([inp, ext, crop, fin]) => {
       setInputFiles(inp.map((f) => f.name));
       setExtractedFiles(ext.map((f) => f.name));
+      setCroppedFiles(crop.map((f) => f.name));
+      setFinalFiles(fin.map((f) => f.name));
     }).catch(() => {});
   });
 
@@ -128,9 +134,13 @@ export default function ToolsPage() {
       Promise.all([
         media.listFiles("input"),
         media.listFiles("extracted"),
-      ]).then(([inp, ext]) => {
+        media.listFiles("cropped"),
+        media.listFiles("final"),
+      ]).then(([inp, ext, crop, fin]) => {
         setInputFiles(inp.map((f) => f.name));
         setExtractedFiles(ext.map((f) => f.name));
+        setCroppedFiles(crop.map((f) => f.name));
+        setFinalFiles(fin.map((f) => f.name));
       }).catch(() => {});
     } catch (e) {
       setCutResult({ success: false, message: e instanceof Error ? e.message : "Error" });
@@ -168,9 +178,13 @@ export default function ToolsPage() {
       Promise.all([
         media.listFiles("input"),
         media.listFiles("extracted"),
-      ]).then(([inp, ext]) => {
+        media.listFiles("cropped"),
+        media.listFiles("final"),
+      ]).then(([inp, ext, crop, fin]) => {
         setInputFiles(inp.map((f) => f.name));
         setExtractedFiles(ext.map((f) => f.name));
+        setCroppedFiles(crop.map((f) => f.name));
+        setFinalFiles(fin.map((f) => f.name));
       }).catch(() => {});
     } catch (e) {
       setMusicResult({ success: false, message: e instanceof Error ? e.message : "Error" });
@@ -208,7 +222,8 @@ export default function ToolsPage() {
     );
   };
 
-  const allVideoFiles = [...new Set([...inputFiles, ...extractedFiles])];
+  const cutVideoFiles = [...new Set([...inputFiles, ...finalFiles])];
+  const allVideoFiles = [...new Set([...inputFiles, ...extractedFiles, ...croppedFiles, ...finalFiles])];
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -237,7 +252,7 @@ export default function ToolsPage() {
               style={{ background: "var(--background)", border: "1px solid var(--border)" }}
             >
               <option value="">Select video...</option>
-              {allVideoFiles.map((f) => (
+              {cutVideoFiles.map((f) => (
                 <option key={f} value={f}>{f}</option>
               ))}
             </select>
@@ -289,7 +304,7 @@ export default function ToolsPage() {
               style={{ background: "var(--background)", border: "1px solid var(--border)" }}
             >
               <option value="">Select video...</option>
-              {allVideoFiles.map((f) => (
+              {inputFiles.map((f) => (
                 <option key={f} value={f}>{f}</option>
               ))}
             </select>

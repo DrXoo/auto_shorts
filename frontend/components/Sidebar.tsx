@@ -9,6 +9,7 @@ import {
   Scissors,
   Wrench,
   Clapperboard,
+  Film,
   Wifi,
   WifiOff,
 } from "lucide-react";
@@ -20,6 +21,7 @@ const NAV = [
   { href: "/transcript", label: "Transcript", icon: FileText },
   { href: "/clips", label: "Clips", icon: Scissors },
   { href: "/tools", label: "Tools", icon: Wrench },
+  { href: "/editor", label: "Editor", icon: Film },
   { href: "/shorts", label: "Shorts", icon: Clapperboard },
 ];
 

@@ -3,7 +3,7 @@ Pydantic models for the AutoShorts web application.
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 from enum import Enum
 
 
@@ -48,6 +48,16 @@ class SpeakerBulkRenameRequest(BaseModel):
 
 class SegmentSpeakerUpdate(BaseModel):
     speaker: str
+
+
+class WordReplacement(BaseModel):
+    find: str
+    replace: str
+
+
+class WordReplaceRequest(BaseModel):
+    """Bulk find-and-replace words/phrases across the entire transcript."""
+    replacements: list[WordReplacement]
 
 
 # ─── Clip Models ─────────────────────────────────────────────────────
@@ -276,3 +286,33 @@ class VideoInfo(BaseModel):
     duration: Optional[float] = None
     codec: Optional[str] = None
     size: int = 0
+
+
+# ─── Editor / Composition Models ─────────────────────────────────────
+
+class ContentSegment(BaseModel):
+    """A time range where shared content should replace (or accompany) speaker footage."""
+    start: float
+    end: float
+    content_region: CropRegion
+    speaker_region: Optional[CropRegion] = None
+    layout: Literal["fullscreen", "split_top", "split_bottom"] = "fullscreen"
+
+
+class EditorRenderRequest(BaseModel):
+    """Full composition render request — produces a single vertical output video."""
+    video_path: str
+    segments: list[ContentSegment]
+    default_speaker_region: CropRegion
+    output_name: Optional[str] = None
+    output_width: int = 1080
+    output_height: int = 1920
+
+
+class EditorComposition(BaseModel):
+    """Saved composition for a specific source video (stored as JSON)."""
+    video_path: str
+    segments: list[ContentSegment]
+    default_speaker_region: Optional[CropRegion] = None
+    output_width: int = 1080
+    output_height: int = 1920
